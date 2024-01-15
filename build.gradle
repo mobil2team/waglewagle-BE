@@ -35,6 +35,8 @@ dependencies {
 
     // mariadb
     implementation 'org.mariadb.jdbc:mariadb-java-client:3.0.4'
+    // 비속어 필터링
+    implementation 'io.github.vaneproject:badwordfiltering:1.0.0'
 }
 
 tasks.named('test') {

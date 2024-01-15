@@ -16,6 +16,7 @@ import com.softee5.mobil2team.repository.ImageRepository;
 import com.softee5.mobil2team.repository.PostRepository;
 import com.softee5.mobil2team.repository.StationRepository;
 import com.softee5.mobil2team.repository.TagRepository;
+import com.vane.badwordfiltering.BadWordFiltering;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -72,8 +73,16 @@ public class PostService {
         int idxNoun = random.nextInt(nickname_noun.length);
         String nickname = nickname_modifier[idx][idxModifier] + " " + nickname_noun[idxNoun];
 
+        // 비속어 처리
+        String content = postDto.getContent();
+        BadWordFiltering badWordFiltering = new BadWordFiltering();
+        if (badWordFiltering.check(content)) {
+            content = badWordFiltering.change(content);
+            System.out.println("content = " + content);
+        }
+
         post.setNickname(nickname);
-        post.setContent(postDto.getContent());
+        post.setContent(content);
         post.setLiked(0);
 
         post.setStation(Station.builder().id(postDto.getStationId()).build()); // 필수
@@ -105,8 +114,16 @@ public class PostService {
             int idxNoun = random.nextInt(nickname_noun.length);
             String nickname = nickname_modifier[idx][idxModifier] + " " + nickname_noun[idxNoun];
 
+            // 비속어 처리
+            String content = postDto.getContent();
+            BadWordFiltering badWordFiltering = new BadWordFiltering();
+            if (badWordFiltering.check(content)) {
+                content = badWordFiltering.change(content);
+                System.out.println("content = " + content);
+            }
+
             post.setNickname(nickname);
-            post.setContent(postDto.getContent());
+            post.setContent(content);
             post.setLiked(0);
 
             post.setStation(Station.builder().id(postDto.getStationId()).build()); // 필수
