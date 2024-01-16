@@ -1,7 +1,6 @@
 package com.softee5.mobil2team.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -12,10 +11,7 @@ import com.softee5.mobil2team.entity.Image;
 import com.softee5.mobil2team.entity.Post;
 import com.softee5.mobil2team.entity.Station;
 import com.softee5.mobil2team.entity.Tag;
-import com.softee5.mobil2team.repository.ImageRepository;
-import com.softee5.mobil2team.repository.PostRepository;
-import com.softee5.mobil2team.repository.StationRepository;
-import com.softee5.mobil2team.repository.TagRepository;
+import com.softee5.mobil2team.repository.*;
 import com.vane.badwordfiltering.BadWordFiltering;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,37 +37,26 @@ public class PostService {
     private PostRepository postRepository;
     @Autowired
     private AmazonS3 amazonS3;
+    @Autowired
+    private NicknameNounRepository nicknameNounRepository;
+    @Autowired
+    private NicknameModifierRepository nicknameModifierRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
-
-    private static String[][] nickname_modifier = {
-            { "출근하기 싫은", "연차 쓰고 싶은" },
-            { "칼퇴에 신난", "발걸음이 빨라진" },
-            { "야근으로 피곤한", "침대에 눕고 싶은" },
-            { "통학에 지친", "자취하고 싶은" },
-            { "밤새서 피곤한", "과제에 뒤덮인" },
-            { "늦잠자버린", "비몽사몽한" },
-            { "숙취에 찌든", "술에 취한" },
-            { "배고파서 어지러운", "배에서 소리나는" },
-            { "에어팟 끼고있는", "버즈 끼고있는" },
-            { "지옥철이 답답한", "당장 내리고 싶은" },
-            { "깜짝놀란", "생생정보통" }
-    };
-    private static String[] nickname_noun = {
-            "회사원", "대학생", "박명수", "정준하", "유재석", "하하", "정형돈", "노홍철", "광희", "짱구", "짱아"
-    };
 
     /* 글 업로드 */
     public DataResponseDto<Void> uploadPost(PostDto postDto) {
         Post post = new Post();
 
+        List<String> nounList = nicknameNounRepository.findAllNouns();
+        List<String> modifierList = nicknameModifierRepository.findNicknameModifiersByTagId(postDto.getTagId());
+
         Random random = new Random();
         random.setSeed(System.currentTimeMillis());
-        int idx = postDto.getTagId() != null && postDto.getTagId() != 0 ? postDto.getTagId().intValue() - 1 : random.nextInt(11);
-        int idxModifier = random.nextInt(2);
-        int idxNoun = random.nextInt(nickname_noun.length);
-        String nickname = nickname_modifier[idx][idxModifier] + " " + nickname_noun[idxNoun];
+        int idxModifier = random.nextInt(modifierList.size());
+        int idxNoun = random.nextInt(nounList.size());
+        String nickname = modifierList.get(idxModifier) + " " + nounList.get(idxNoun);
 
         // 비속어 처리
         String content = postDto.getContent();
@@ -107,12 +92,14 @@ public class PostService {
                 imageUrl = saveFile(file);
             }
 
+            List<String> nounList = nicknameNounRepository.findAllNouns();
+            List<String> modifierList = nicknameModifierRepository.findNicknameModifiersByTagId(postDto.getTagId());
+
             Random random = new Random();
             random.setSeed(System.currentTimeMillis());
-            int idx = postDto.getTagId() != null && postDto.getTagId() != 0 ? postDto.getTagId().intValue() - 1 : random.nextInt(11);
-            int idxModifier = random.nextInt(2);
-            int idxNoun = random.nextInt(nickname_noun.length);
-            String nickname = nickname_modifier[idx][idxModifier] + " " + nickname_noun[idxNoun];
+            int idxModifier = random.nextInt(modifierList.size());
+            int idxNoun = random.nextInt(nounList.size());
+            String nickname = modifierList.get(idxModifier) + " " + nounList.get(idxNoun);
 
             // 비속어 처리
             String content = postDto.getContent();
