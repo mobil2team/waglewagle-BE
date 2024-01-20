@@ -72,13 +72,4 @@ public class PostController {
             @RequestParam(value = "tagId", required = false) @Parameter(description = "조회할 태그 ID", required = false, example = "1") Long tagId) {
         return new ResponseEntity<>(postService.getPostList(id, pageSize, pageNumber, tagId), HttpStatus.OK);
     }
-
-    /* 게시글 신고 */
-    @PostMapping("/report")
-    public ResponseEntity<ResponseDto> reportPost(@RequestBody ReportDto reportDto) {
-        if (postService.report(reportDto)) {
-            return new ResponseEntity<>(ResponseDto.of(true, ResponseCode.OK, "게시글 신고 성공"), HttpStatus.OK);
-        }
-        throw new GeneralException(ResponseCode.BAD_REQUEST, "게시글 신고 실패");
-    }
 }

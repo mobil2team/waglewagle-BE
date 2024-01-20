@@ -33,10 +33,6 @@ public class PostService {
     @Autowired
     private PostRepository postRepository;
     @Autowired
-    private ReportRepository reportRepository;
-    @Autowired
-    private CommonCodeRepository commonCodeRepository;
-    @Autowired
     private AmazonS3 amazonS3;
     @Autowired
     private NicknameNounRepository nicknameNounRepository;
@@ -216,29 +212,6 @@ public class PostService {
 
         PageInfoDto pageInfoDto = new PageInfoDto(pageNumber, pageSize, postList.getTotalElements(), postList.getTotalPages());
         return PageResponseDto.of(new PostListDto(results), pageInfoDto);
-    }
-
-    /* 게시글 신고 */
-    public boolean report(ReportDto reportDto) {
-        Report report = new Report();
-
-        Long postId = reportDto.getPostId();
-        Long reportId = reportDto.getReportId();
-
-        if(postId == null || reportId == null) {
-            return false;
-        }
-
-        if (!postRepository.existsById(postId) || !commonCodeRepository.existsById(reportId)) {
-            return false;
-        }
-
-        report.setPost(Post.builder().id(reportDto.getPostId()).build());
-        report.setCommonCode(CommonCode.builder().id(reportDto.getReportId()).build());
-
-        reportRepository.save(report);
-
-        return true;
     }
 
 }
