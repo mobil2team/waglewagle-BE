@@ -7,10 +7,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.softee5.mobil2team.config.GeneralException;
 import com.softee5.mobil2team.config.ResponseCode;
 import com.softee5.mobil2team.dto.*;
-import com.softee5.mobil2team.entity.Image;
-import com.softee5.mobil2team.entity.Post;
-import com.softee5.mobil2team.entity.Station;
-import com.softee5.mobil2team.entity.Tag;
+import com.softee5.mobil2team.entity.*;
 import com.softee5.mobil2team.repository.*;
 import com.vane.badwordfiltering.BadWordFiltering;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +32,10 @@ public class PostService {
     private ImageRepository imageRepository;
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private ReportRepository reportRepository;
+    @Autowired
+    private CommonCodeRepository commonCodeRepository;
     @Autowired
     private AmazonS3 amazonS3;
     @Autowired
@@ -63,7 +64,6 @@ public class PostService {
         BadWordFiltering badWordFiltering = new BadWordFiltering();
         if (badWordFiltering.check(content)) {
             content = badWordFiltering.change(content);
-            System.out.println("content = " + content);
         }
 
         post.setNickname(nickname);
@@ -78,7 +78,6 @@ public class PostService {
 
         return DataResponseDto.of(null);
     }
-
 
     /* 사진 첨부 글 업로드 */
     public DataResponseDto<Void> uploadPostWithImage(PostDto postDto, MultipartFile file) {
@@ -217,6 +216,29 @@ public class PostService {
 
         PageInfoDto pageInfoDto = new PageInfoDto(pageNumber, pageSize, postList.getTotalElements(), postList.getTotalPages());
         return PageResponseDto.of(new PostListDto(results), pageInfoDto);
+    }
+
+    /* 게시글 신고 */
+    public ResponseDto report(ReportDto reportDto) {
+        Report report = new Report();
+
+        Long postId = reportDto.getPostId();
+        Long reportId = reportDto.getReportId();
+
+        if(postId == null || reportId == null) {
+            return ResponseDto.of(false, ResponseCode.BAD_REQUEST);
+        }
+
+        if (!postRepository.existsById(postId) || !commonCodeRepository.existsById(reportId)) {
+            return ResponseDto.of(false, ResponseCode.BAD_REQUEST);
+        }
+
+        report.setPost(Post.builder().id(reportDto.getPostId()).build());
+        report.setCommonCode(CommonCode.builder().id(reportDto.getReportId()).build());
+
+        reportRepository.save(report);
+
+        return ResponseDto.of(true, ResponseCode.OK);
     }
 
 }
