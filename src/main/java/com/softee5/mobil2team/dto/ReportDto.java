@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReportDto {
     private Long postId;
-    private String reason;
+    private Long reportId;
 }
