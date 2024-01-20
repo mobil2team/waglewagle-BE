@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/v2/report")
 public class ReportController {
-    private ReportService reportService;
+    private final ReportService reportService;
 
     /* 게시글 신고 */
     @PostMapping("/")
