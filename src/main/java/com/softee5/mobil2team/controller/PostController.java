@@ -34,8 +34,8 @@ public class PostController {
 
     /* 사진 첨부 글 업로드 */
     @PostMapping(value = "/upload/image", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<DataResponseDto<Void>> uploadPostWithImage (@RequestPart PostDto postDto,
-                                                            @RequestPart(required = false) MultipartFile imageFile) {
+    public ResponseEntity<DataResponseDto<Void>> uploadPostWithImage(@RequestPart PostDto postDto,
+                                                                     @RequestPart(required = false) MultipartFile imageFile) {
         return new ResponseEntity<>(
                 postService.uploadPostWithImage(postDto, imageFile),
                 HttpStatus.OK
@@ -55,7 +55,7 @@ public class PostController {
     /* 좋아요 수 업데이트 */
     @PostMapping("/like")
     @Operation(summary = "좋아요 수 업데이트", description = "해당 게시글의 좋아요 수 반영")
-    public ResponseEntity<ResponseDto> updateLiked(@RequestBody LikeDto likeDto){
+    public ResponseEntity<ResponseDto> updateLiked(@RequestBody LikeDto likeDto) {
         if (postService.updateLiked(likeDto)) {
             return new ResponseEntity<>(ResponseDto.of(true, ResponseCode.OK, "좋아요 수 업데이트 성공"), HttpStatus.OK);
         }
@@ -71,5 +71,14 @@ public class PostController {
             @RequestParam(value = "pageNumber") @Parameter(description = "요청하는 페이지 번호 (1부터 시작)", required = true, example = "1") Integer pageNumber,
             @RequestParam(value = "tagId", required = false) @Parameter(description = "조회할 태그 ID", required = false, example = "1") Long tagId) {
         return new ResponseEntity<>(postService.getPostList(id, pageSize, pageNumber, tagId), HttpStatus.OK);
+    }
+
+    /* 게시글 신고 */
+    @PostMapping("/report")
+    public ResponseEntity<ResponseDto> reportPost(@RequestBody ReportDto reportDto) {
+        if (postService.report(reportDto)) {
+            return new ResponseEntity<>(ResponseDto.of(true, ResponseCode.OK, "게시글 신고 성공"), HttpStatus.OK);
+        }
+        throw new GeneralException(ResponseCode.BAD_REQUEST, "게시글 신고 실패");
     }
 }

@@ -219,18 +219,18 @@ public class PostService {
     }
 
     /* 게시글 신고 */
-    public ResponseDto report(ReportDto reportDto) {
+    public boolean report(ReportDto reportDto) {
         Report report = new Report();
 
         Long postId = reportDto.getPostId();
         Long reportId = reportDto.getReportId();
 
         if(postId == null || reportId == null) {
-            return ResponseDto.of(false, ResponseCode.BAD_REQUEST);
+            return false;
         }
 
         if (!postRepository.existsById(postId) || !commonCodeRepository.existsById(reportId)) {
-            return ResponseDto.of(false, ResponseCode.BAD_REQUEST);
+            return false;
         }
 
         report.setPost(Post.builder().id(reportDto.getPostId()).build());
@@ -238,7 +238,7 @@ public class PostService {
 
         reportRepository.save(report);
 
-        return ResponseDto.of(true, ResponseCode.OK);
+        return true;
     }
 
 }
