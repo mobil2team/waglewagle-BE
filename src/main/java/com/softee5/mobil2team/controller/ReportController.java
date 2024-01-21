@@ -19,7 +19,7 @@ public class ReportController {
     private final ReportService reportService;
 
     /* 게시글 신고 */
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<ResponseDto> reportPost(@RequestBody ReportDto reportDto) {
         if (reportService.report(reportDto)) {
             return new ResponseEntity<>(ResponseDto.of(true, ResponseCode.OK, "게시글 신고 성공"), HttpStatus.OK);
