@@ -1,7 +1,5 @@
 package com.softee5.mobil2team.controller;
 
-import com.softee5.mobil2team.config.GeneralException;
-import com.softee5.mobil2team.config.ResponseCode;
 import com.softee5.mobil2team.dto.CommonCodeListDto;
 import com.softee5.mobil2team.dto.DataResponseDto;
 import com.softee5.mobil2team.dto.ReportDto;
@@ -21,10 +19,7 @@ public class ReportController {
     /* 게시글 신고 */
     @PostMapping("")
     public ResponseEntity<ResponseDto> reportPost(@RequestBody ReportDto reportDto) {
-        if (reportService.report(reportDto)) {
-            return new ResponseEntity<>(ResponseDto.of(true, ResponseCode.OK, "게시글 신고 성공"), HttpStatus.OK);
-        }
-        throw new GeneralException(ResponseCode.BAD_REQUEST, "게시글 신고 실패");
+        return new ResponseEntity<>(reportService.report(reportDto), HttpStatus.OK);
     }
 
     /* 신고 사유 조회 */

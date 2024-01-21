@@ -1,9 +1,8 @@
 package com.softee5.mobil2team.service;
 
-import com.softee5.mobil2team.dto.CommonCodeDto;
-import com.softee5.mobil2team.dto.CommonCodeListDto;
-import com.softee5.mobil2team.dto.DataResponseDto;
-import com.softee5.mobil2team.dto.ReportDto;
+import com.softee5.mobil2team.config.GeneralException;
+import com.softee5.mobil2team.config.ResponseCode;
+import com.softee5.mobil2team.dto.*;
 import com.softee5.mobil2team.entity.CommonCode;
 import com.softee5.mobil2team.entity.Post;
 import com.softee5.mobil2team.entity.Report;
@@ -28,20 +27,15 @@ public class ReportService {
 
 
     /* 게시글 신고 */
-    public boolean report(ReportDto reportDto) {
+    public ResponseDto report(ReportDto reportDto) {
         Report report = new Report();
 
         Long postId = reportDto.getPostId();
         Long reportId = reportDto.getReportId();
 
-        // null값 확인
-        if(postId == null || reportId == null) {
-            return false;
-        }
-
-        // 게시글 및 신고 사유 있는지 확인
-        if (!postRepository.existsById(postId) || !commonCodeRepository.existsById(reportId)) {
-            return false;
+        // 데이터 유효성 검증 (널 값, 해당 데이터 있는지 확인)
+        if(!validateData(postId, reportId)) {
+            throw new GeneralException(ResponseCode.BAD_REQUEST, "게시글 신고 실패");
         }
 
         // 게시글, 신고 세팅
@@ -50,7 +44,11 @@ public class ReportService {
 
         reportRepository.save(report);
 
-        return true;
+        return ResponseDto.of(true, ResponseCode.OK, "게시글 신고 성공");
+    }
+
+    private boolean validateData(Long postId, Long reportId) {
+        return postId != null && reportId != null && postRepository.existsById(postId) && commonCodeRepository.existsById(reportId);
     }
 
     /* 신고 사유 전체 조회 */
