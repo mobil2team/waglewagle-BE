@@ -34,8 +34,8 @@ public class PostController {
 
     /* 사진 첨부 글 업로드 */
     @PostMapping(value = "/upload/image", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<DataResponseDto<Void>> uploadPostWithImage (@RequestPart PostDto postDto,
-                                                            @RequestPart(required = false) MultipartFile imageFile) {
+    public ResponseEntity<DataResponseDto<Void>> uploadPostWithImage(@RequestPart PostDto postDto,
+                                                                     @RequestPart(required = false) MultipartFile imageFile) {
         return new ResponseEntity<>(
                 postService.uploadPostWithImage(postDto, imageFile),
                 HttpStatus.OK
@@ -55,7 +55,7 @@ public class PostController {
     /* 좋아요 수 업데이트 */
     @PostMapping("/like")
     @Operation(summary = "좋아요 수 업데이트", description = "해당 게시글의 좋아요 수 반영")
-    public ResponseEntity<ResponseDto> updateLiked(@RequestBody LikeDto likeDto){
+    public ResponseEntity<ResponseDto> updateLiked(@RequestBody LikeDto likeDto) {
         if (postService.updateLiked(likeDto)) {
             return new ResponseEntity<>(ResponseDto.of(true, ResponseCode.OK, "좋아요 수 업데이트 성공"), HttpStatus.OK);
         }

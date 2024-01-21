@@ -7,10 +7,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.softee5.mobil2team.config.GeneralException;
 import com.softee5.mobil2team.config.ResponseCode;
 import com.softee5.mobil2team.dto.*;
-import com.softee5.mobil2team.entity.Image;
-import com.softee5.mobil2team.entity.Post;
-import com.softee5.mobil2team.entity.Station;
-import com.softee5.mobil2team.entity.Tag;
+import com.softee5.mobil2team.entity.*;
 import com.softee5.mobil2team.repository.*;
 import com.vane.badwordfiltering.BadWordFiltering;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +60,6 @@ public class PostService {
         BadWordFiltering badWordFiltering = new BadWordFiltering();
         if (badWordFiltering.check(content)) {
             content = badWordFiltering.change(content);
-            System.out.println("content = " + content);
         }
 
         post.setNickname(nickname);
@@ -78,7 +74,6 @@ public class PostService {
 
         return DataResponseDto.of(null);
     }
-
 
     /* 사진 첨부 글 업로드 */
     public DataResponseDto<Void> uploadPostWithImage(PostDto postDto, MultipartFile file) {
