@@ -101,8 +101,12 @@ jobs:
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.PRIVATE_KEY }}
         script: |
-          docker stop ${{ secrets.CONTAINER_NAME }}
-          docker rm ${{ secrets.CONTAINER_NAME }}
+          docker stop ${{ secrets.CONTAINER_NAME_1 }}
+          docker rm ${{ secrets.CONTAINER_NAME_1 }}
           docker rmi $(docker images -q)
           docker pull ${{ secrets.DOCKER_REPO }}
-          docker run -d -p 443:80 -p 80:80 --name ${{ secrets.CONTAINER_NAME }} -v /home/${{ secrets.EC2_USERNAME }}/data:/data ${{ secrets.DOCKER_REPO }}
+          docker run -d -p 443:80 -p 80:80 --name ${{ secrets.CONTAINER_NAME_1 }} ${{ secrets.DOCKER_REPO }}
+          sleep 2m
+          docker stop ${{ secrets.CONTAINER_NAME_2 }}
+          docker rm ${{ secrets.CONTAINER_NAME_2 }}
+          docker run -d -p 444:80 -p 81:80 --name ${{ secrets.CONTAINER_NAME_2 }} ${{ secrets.DOCKER_REPO }
